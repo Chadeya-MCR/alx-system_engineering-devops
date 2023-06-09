@@ -1,2 +1,2 @@
 #!/bin/bash
-stat -c "%n: %s bytes, %F" /tmp/iamafile
+file /tmp/iamafile
