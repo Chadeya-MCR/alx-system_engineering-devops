@@ -1,2 +1,2 @@
 #!/bin/bash
-sort < morgan.txt
+echo "Hello, World"
