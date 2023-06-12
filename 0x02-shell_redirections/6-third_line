@@ -1,2 +1,2 @@
 #!/bin/bash
-readarray -s 2 -n 1 line < iacta; echo "${line}"
+line=$(head -n 3 iacta | tail -n 1); echo "$line"
