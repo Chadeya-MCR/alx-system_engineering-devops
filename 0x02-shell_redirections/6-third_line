@@ -1,0 +1,2 @@
+#!/bin/bash
+readarray -s 2 -n 1 line < iacta; echo "${line}"
