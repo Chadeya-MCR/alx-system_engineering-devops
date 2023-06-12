@@ -1,3 +1,2 @@
 #!/bin/bash
-
-count=$(find . -type d -not -path '*/\.*' | wc -l); echo "Total: $count"
+count=$(find . -type d -not -path '*/\.*' | wc -l); echo "Total: $((count-2))"
