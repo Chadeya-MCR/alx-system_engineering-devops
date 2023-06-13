@@ -1,2 +1,2 @@
 #!/bin/bash
-find . -type f -iname '*.gif' -exec basename -s .gif {} \; | LC_ALL=C sort -f; echo
+find . -type f -iname '*.gif' -exec ls -ld {} + | while read -r line; do echo "${line##* }"; done | LC_ALL=C sort -f; echo
