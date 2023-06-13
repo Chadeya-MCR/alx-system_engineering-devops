@@ -1,0 +1,2 @@
+#!/bin/bash
+(set | grep -vE '^BASH_FUNC|^_'; declare -F)
