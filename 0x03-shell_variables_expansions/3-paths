@@ -1,0 +1,2 @@
+#!/bin/bash
+directory="/path/to/directory"; find "$directory" -type d | wc -l
