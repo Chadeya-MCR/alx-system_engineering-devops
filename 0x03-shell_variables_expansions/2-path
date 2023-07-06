@@ -1,2 +1,2 @@
 #!/bin/bash
-export PATH=$path:/action
+IFS=":" read -ra directories <<< "$PATH"; echo "directories: ${#directories[@]}"
