@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 # Check if an IP address is provided
 if [ "$#" -ne 1 ]; then
