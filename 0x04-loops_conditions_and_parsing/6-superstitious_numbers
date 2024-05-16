@@ -5,14 +5,24 @@
 #   "bad luck from Italy" for the 17th loop iteration
 
 count=1
-
 while [ $count -le 20 ]
 do
-  echo "$count"
   case $count in
-    "4") echo "bad luck from China";;
-    "9") echo "bad luck from Japan";;
-    "17") echo "bad luck from Italy";;
+    4)
+      echo "4"
+      echo "bad luck from China"
+      ;;
+    9)
+      echo "9"
+      echo "bad luck from Japan"
+      ;;
+    17)
+      echo "17"
+      echo "bad luck from Italy"
+      ;;
+    *)
+      echo $count
+      ;;
   esac
-  (( count++ ))
+  count=$((count + 1))
 done
