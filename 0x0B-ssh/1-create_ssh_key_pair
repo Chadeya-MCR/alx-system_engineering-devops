@@ -1,3 +1,4 @@
-#!/usr/bin/env bash
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/school -P "betty" -m PEM
+#!/bin/bash
+# Create an RSA key pair with specified name and bits, protected by passphrase
+ssh-keygen -t rsa -b 4096 -N "betty" -C "Generated key for school" -f school
 
