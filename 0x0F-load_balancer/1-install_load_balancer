@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# install load balancer
+# Install load balancer
 
-# colors
+# Colors for output
 blue='\e[1;34m'
 brown='\e[0;33m'
 green='\e[1;32m'
@@ -10,34 +10,54 @@ reset='\033[0m'
 echo -e "${blue}Updating and doing some minor checks...${reset}\n"
 
 function install() {
-	command -v "$1" &> /dev/null
+    command -v "$1" &> /dev/null
 
-	#shellcheck disable=SC2181
-	if [ $? -ne 0 ]; then
-		echo -e "	Installing: ${brown}$1${reset}\n"
-		sudo apt-get update -y -qq && \
-			sudo apt-get install -y "$1" -qq
-		echo -e "\n"
-	else
-		echo -e "	${green}${1} is already installed.${reset}\n"
-	fi
+    # shellcheck disable=SC2181
+    if [ $? -ne 0 ]; then
+        echo -e "    Installing: ${brown}$1${reset}\n"
+        sudo apt-get update -y -qq && \
+            sudo apt-get install -y "$1" -qq
+        echo -e "\n"
+    else
+        echo -e "    ${green}${1} is already installed.${reset}\n"
+    fi
 }
 
-install haproxy #install haproxy
+install haproxy # Install HAproxy
 
 echo -e "\n${blue}Setting up some minor stuff.${reset}\n"
 
-# backup default server config file
-sudo cp /etc/haproxy/haproxy.cfg haproxy_default.backup
+# Backup default server config file
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
 
-server_config=\
-"
+# HAproxy server configuration
+server_config=$(cat <<EOF
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
 defaults
-  mode http
-  timeout client 15s
-  timeout connect 10s
-  timeout server 15s
-  timeout http-request 10s
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+    timeout http-request 10s
+    errorfile 400 /etc/haproxy/errors/400.http
+    errorfile 403 /etc/haproxy/errors/403.http
+    errorfile 408 /etc/haproxy/errors/408.http
+    errorfile 500 /etc/haproxy/errors/500.http
+    errorfile 502 /etc/haproxy/errors/502.http
+    errorfile 503 /etc/haproxy/errors/503.http
+    errorfile 504 /etc/haproxy/errors/504.http
 
 frontend th3gr00t-tech-frontend
     bind *:80
@@ -47,16 +67,21 @@ backend th3gr00t-tech-backend
     balance roundrobin
     server 453-web-01 35.243.128.200:80 check
     server 453-web-02 3.239.120.96:80 check
-"
+EOF
+)
 
-# shellcheck disable=SC2154
-echo "$server_config" | sudo dd status=none of=/etc/haproxy/haproxy.cfg
+# Apply the configuration
+echo "$server_config" | sudo tee /etc/haproxy/haproxy.cfg
 
-# enable haproxy to be started by init script
-echo "ENABLED=1" | sudo dd status=none of=/etc/default/haproxy
+# Enable HAproxy to be started by init script
+echo "ENABLED=1" | sudo tee /etc/default/haproxy
 
-if [ "$(pgrep -c haproxy)" -le 0 ]; then
-	sudo service haproxy start
+# Restart HAproxy to apply the new configuration
+if ! pgrep -x "haproxy" > /dev/null; then
+    sudo service haproxy start
 else
-	sudo service haproxy restart
+    sudo service haproxy restart
 fi
+
+# Print success message
+echo -e "${green}HAproxy is successfully installed and running.${reset}\n"
